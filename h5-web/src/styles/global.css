@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --h5-teal: #3a7d7b;
+  --h5-teal-light: #e8f4f3;
+  --h5-teal-dark: #2c5f5e;
+  --h5-coral: #d4836b;
+  --h5-coral-light: #fdf0eb;
+  --h5-sage: #7bae94;
+  --h5-bg: #f7f6f4;
+  --h5-text: #2d3436;
+  --h5-text-secondary: #94a3b8;
+  --h5-border: #e8e6e1;
+
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after {
+  font-family: var(--font);
+}
+
+body {
+  background: var(--h5-bg);
+  color: var(--h5-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Vant 主题覆盖 */
+:root:root {
+  --van-primary-color: var(--h5-teal);
+  --van-primary-color-light: var(--h5-teal-light);
+  --van-nav-bar-background: #fff;
+  --van-nav-bar-title-text-color: var(--h5-text);
+  --van-tabbar-item-active-color: var(--h5-teal);
+  --van-tabbar-item-font-size: 11px;
+  --van-button-primary-background: var(--h5-teal);
+  --van-button-primary-border-color: var(--h5-teal);
+  --van-button-border-radius: 10px;
+  --van-cell-group-inset-padding: 0 16px;
+  --van-cell-group-inset-radius: 14px;
+  --van-field-label-width: 5em;
+  --van-tag-primary-color: var(--h5-teal);
+  --van-tag-success-color: var(--h5-sage);
+  --van-tag-danger-color: var(--h5-coral);
+}
+
+.van-nav-bar {
+  box-shadow: 0 1px 4px rgba(58, 125, 123, 0.04);
+}
+
+.van-nav-bar__title {
+  font-weight: 600;
+  font-size: 16px;
+  font-family: var(--font);
+}
+
+.van-nav-bar__arrow {
+  color: var(--h5-text) !important;
+}
+
+.van-tabbar {
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.04);
+  border-top: none;
+}
+
+.van-tabbar-item--active {
+  color: var(--h5-teal) !important;
+}
+
+.van-cell-group--inset {
+  margin: 12px 16px !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(58, 125, 123, 0.04);
+}
+
+.van-cell__title {
+  font-family: var(--font);
+}
+
+.van-button--primary {
+  font-weight: 500;
+  font-family: var(--font);
+}
+
+.van-field__label {
+  font-family: var(--font);
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background: var(--h5-teal-light);
+  color: var(--h5-teal-dark);
+}

@@ -1,16 +1,18 @@
 <template>
-  <div style="padding-bottom: 60px">
+  <div class="appt-page">
     <van-nav-bar title="在线预约" left-arrow @click-left="$router.back()" />
 
-    <van-cell-group inset style="margin-top: 12px">
-      <van-field v-model="form.appointmentDate" is-link readonly label="预约日期" placeholder="选择日期" @click="showDatePicker = true" />
-      <van-field v-model="form.startTime" is-link readonly label="开始时间" placeholder="选择时间" @click="showTimePicker = true" />
-      <van-field v-model="selectedServiceName" is-link readonly label="服务项目" placeholder="选择项目" @click="showServicePicker = true" />
-      <van-field v-model="form.remark" label="备注" placeholder="选填" type="textarea" rows="2" />
-    </van-cell-group>
+    <div class="form-section">
+      <van-cell-group inset>
+        <van-field v-model="form.appointmentDate" is-link readonly label="预约日期" placeholder="选择日期" @click="showDatePicker = true" />
+        <van-field v-model="form.startTime" is-link readonly label="开始时间" placeholder="选择时间" @click="showTimePicker = true" />
+        <van-field v-model="selectedServiceName" is-link readonly label="服务项目" placeholder="选择项目" @click="showServicePicker = true" />
+        <van-field v-model="form.remark" label="备注" placeholder="选填" type="textarea" rows="2" />
+      </van-cell-group>
+    </div>
 
-    <div style="padding: 20px">
-      <van-button type="primary" block round @click="handleSubmit">提交预约</van-button>
+    <div class="btn-wrap">
+      <van-button type="primary" block round @click="handleSubmit" class="submit-btn">提交预约</van-button>
     </div>
 
     <van-popup v-model:show="showDatePicker" position="bottom" round>
@@ -76,7 +78,7 @@ async function handleSubmit() {
     return
   }
   const storeId = localStorage.getItem('h5_store_id')
-  await createAppointment({ ...form, storeId, source: 'SELF', status: 'PENDING' })
+  await createAppointment({ ...form, storeId, source: 1, status: 1 })
   showToast('预约成功')
   router.push('/home')
 }
@@ -89,3 +91,25 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.appt-page {
+  padding-bottom: 70px;
+  min-height: 100vh;
+  background: var(--h5-bg);
+}
+
+.form-section {
+  padding-top: 8px;
+}
+
+.btn-wrap {
+  padding: 24px 20px;
+}
+
+.submit-btn {
+  height: 46px;
+  font-size: 15px;
+  font-weight: 600;
+}
+</style>

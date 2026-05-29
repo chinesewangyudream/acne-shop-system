@@ -1,8 +1,9 @@
 package com.acneshop.mapper;
 
-import com.acneshop.entity.ConsumeRecord;
+import com.acneshop.entity.Employee;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ConsumeRecordMapper extends BaseMapper<ConsumeRecord> {}
+public interface EmployeeMapper extends BaseMapper<Employee> {
+}

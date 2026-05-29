@@ -23,13 +23,13 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Long userId, String username, String role, Long storeId) {
+    public String generateToken(Long employeeId, String phone, Integer role, Long storeId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .subject(String.valueOf(userId))
-                .claim("username", username)
+                .subject(String.valueOf(employeeId))
+                .claim("phone", phone)
                 .claim("role", role)
                 .claim("storeId", storeId)
                 .issuedAt(now)
@@ -59,8 +59,8 @@ public class JwtTokenProvider {
         return Long.valueOf(parseToken(token).getSubject());
     }
 
-    public String getRole(String token) {
-        return parseToken(token).get("role", String.class);
+    public Integer getRole(String token) {
+        return parseToken(token).get("role", Integer.class);
     }
 
     public Long getStoreId(String token) {

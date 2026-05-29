@@ -6,11 +6,13 @@ import com.acneshop.service.StoreService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/store")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('BOSS')")
 public class AdminStoreController {
 
     private final StoreService storeService;
@@ -18,12 +20,18 @@ public class AdminStoreController {
     @GetMapping("/page")
     public Result<Page<Store>> page(@RequestParam(defaultValue = "1") Integer current,
                                     @RequestParam(defaultValue = "10") Integer size,
-                                    @RequestParam(required = false) String name) {
+                                    @RequestParam(required = false) String storeName) {
         Page<Store> page = storeService.page(new Page<>(current, size),
                 new LambdaQueryWrapper<Store>()
-                        .like(name != null, Store::getName, name)
+                        .like(storeName != null, Store::getStoreName, storeName)
                         .orderByDesc(Store::getCreateTime));
         return Result.success(page);
+    }
+
+    @GetMapping("/list")
+    public Result<?> list() {
+        return Result.success(storeService.list(
+                new LambdaQueryWrapper<Store>().eq(Store::getStatus, 1)));
     }
 
     @PostMapping

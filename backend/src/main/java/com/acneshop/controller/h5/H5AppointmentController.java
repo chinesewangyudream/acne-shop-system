@@ -30,8 +30,8 @@ public class H5AppointmentController {
 
     @PostMapping
     public Result<Void> create(@RequestBody Appointment appointment) {
-        appointment.setSource("SELF");
-        appointment.setStatus("PENDING");
+        appointment.setSource(1); // 顾客自助
+        appointment.setStatus(1); // 待确认
         appointmentService.save(appointment);
         return Result.success();
     }
@@ -51,7 +51,7 @@ public class H5AppointmentController {
     public Result<Void> cancel(@PathVariable Long id) {
         Appointment appointment = new Appointment();
         appointment.setId(id);
-        appointment.setStatus("CANCELLED");
+        appointment.setStatus(4); // 已取消
         appointmentService.updateById(appointment);
         return Result.success();
     }

@@ -2,9 +2,9 @@ package com.acneshop.service.impl;
 
 import com.acneshop.common.ResultCode;
 import com.acneshop.dto.LoginDTO;
-import com.acneshop.entity.User;
+import com.acneshop.entity.Employee;
 import com.acneshop.exception.BusinessException;
-import com.acneshop.mapper.UserMapper;
+import com.acneshop.mapper.EmployeeMapper;
 import com.acneshop.security.JwtTokenProvider;
 import com.acneshop.service.AuthService;
 import com.acneshop.vo.LoginVO;
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserMapper userMapper;
+    private final EmployeeMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -29,27 +29,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginVO login(LoginDTO dto) {
-        User user = userMapper.selectOne(
-                new LambdaQueryWrapper<User>().eq(User::getUsername, dto.getUsername()));
-        if (user == null) {
+        Employee employee = employeeMapper.selectOne(
+                new LambdaQueryWrapper<Employee>().eq(Employee::getPhone, dto.getPhone()));
+        if (employee == null) {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), employee.getPasswordHash())) {
             throw new BusinessException(ResultCode.PASSWORD_ERROR);
         }
-        if (user.getStatus() == 0) {
+        if (employee.getStatus() == 0) {
             throw new BusinessException(ResultCode.FAIL.getCode(), "账号已停用");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), user.getRole(), user.getStoreId());
+        String token = jwtTokenProvider.generateToken(employee.getId(), employee.getPhone(), employee.getRole(), employee.getStoreId());
 
         LoginVO vo = new LoginVO();
         vo.setToken(token);
-        vo.setUserId(user.getId());
-        vo.setUsername(user.getUsername());
-        vo.setRealName(user.getRealName());
-        vo.setRole(user.getRole());
-        vo.setStoreId(user.getStoreId());
+        vo.setEmployeeId(employee.getId());
+        vo.setName(employee.getName());
+        vo.setPhone(employee.getPhone());
+        vo.setRole(employee.getRole());
+        vo.setStoreId(employee.getStoreId());
         return vo;
     }
 
@@ -64,19 +64,17 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ResultCode.SMS_CODE_ERROR);
         }
 
-        // H5登录用手机号匹配客户，生成临时token
-        String token = jwtTokenProvider.generateToken(0L, phone, "CUSTOMER", null);
+        String token = jwtTokenProvider.generateToken(0L, phone, 0, null);
 
         LoginVO vo = new LoginVO();
         vo.setToken(token);
-        vo.setUsername(phone);
-        vo.setRole("CUSTOMER");
+        vo.setPhone(phone);
+        vo.setRole(0);
         return vo;
     }
 
     public void sendSmsCode(String phone) {
         String code = String.valueOf((int) ((Math.random() * 9 + 1) * 100000));
         redisTemplate.opsForValue().set(SMS_CODE_PREFIX + phone, code, 5, TimeUnit.MINUTES);
-        // TODO: 对接短信服务商发送验证码
     }
 }

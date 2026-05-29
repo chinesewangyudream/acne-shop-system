@@ -12,6 +12,11 @@ request.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  if (config.params) {
+    config.params = Object.fromEntries(
+      Object.entries(config.params).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+    )
+  }
   return config
 })
 
@@ -23,6 +28,9 @@ request.interceptors.response.use(
       if (res.code === 401) {
         localStorage.removeItem('token')
         router.push('/login')
+      }
+      if (res.code === 403) {
+        ElMessage.error('无权限访问该功能')
       }
       return Promise.reject(new Error(res.message))
     }

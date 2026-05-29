@@ -1,7 +1,6 @@
 package com.acneshop.security;
 
-import com.acneshop.common.ResultCode;
-import com.acneshop.entity.User;
+import com.acneshop.entity.Employee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,13 +8,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -30,16 +30,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             Long userId = jwtTokenProvider.getUserId(token);
-            String role = jwtTokenProvider.getRole(token);
+            Integer role = jwtTokenProvider.getRole(token);
             Long storeId = jwtTokenProvider.getStoreId(token);
 
-            User user = new User();
-            user.setId(userId);
-            user.setRole(role);
-            user.setStoreId(storeId);
+            Employee employee = new Employee();
+            employee.setId(userId);
+            employee.setRole(role);
+            employee.setStoreId(storeId);
 
+            // role 1=BOSS, 2=MANAGER, 3=RECEPTIONIST, 4=BEAUTICIAN
+            String roleStr = switch (role) {
+                case 1 -> "BOSS";
+                case 2 -> "MANAGER";
+                case 3 -> "RECEPTIONIST";
+                case 4 -> "BEAUTICIAN";
+                default -> "UNKNOWN";
+            };
+            List<SimpleGrantedAuthority> authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + roleStr)
+            );
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                    new UsernamePasswordAuthenticationToken(employee, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
