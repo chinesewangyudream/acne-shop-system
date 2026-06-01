@@ -130,6 +130,7 @@ CREATE TABLE treatment_record (
     feedback TEXT COMMENT '术后反馈',
     treatment_date DATETIME NOT NULL COMMENT '治疗时间',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted INT DEFAULT 0 COMMENT '逻辑删除'
 ) COMMENT '治疗记录表';
 

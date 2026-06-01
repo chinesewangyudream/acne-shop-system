@@ -2,6 +2,7 @@ package com.acneshop.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import java.time.LocalDate;
@@ -20,4 +21,6 @@ public class SkinRecord {
     private String note;
     private LocalDate recordDate;
     private LocalDateTime createdAt;
+    @TableLogic
+    private Integer deleted;
 }

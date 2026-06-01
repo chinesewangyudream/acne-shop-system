@@ -2,8 +2,10 @@ package com.acneshop.controller.admin;
 
 import com.acneshop.common.Result;
 import com.acneshop.entity.Appointment;
+import com.acneshop.entity.Customer;
 import com.acneshop.security.SecurityUtils;
 import com.acneshop.service.AppointmentService;
+import com.acneshop.service.CustomerService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/admin/appointment")
@@ -19,6 +22,7 @@ import java.time.LocalDate;
 public class AdminAppointmentController {
 
     private final AppointmentService appointmentService;
+    private final CustomerService customerService;
 
     @GetMapping("/page")
     public Result<Page<Appointment>> page(@RequestParam(defaultValue = "1") Integer current,
@@ -63,10 +67,18 @@ public class AdminAppointmentController {
 
     @PutMapping("/complete/{id}")
     public Result<Void> complete(@PathVariable Long id) {
-        Appointment appointment = new Appointment();
-        appointment.setId(id);
+        Appointment appointment = appointmentService.getById(id);
+        if (appointment == null) {
+            return Result.fail(404, "预约不存在");
+        }
         appointment.setStatus(3); // 已完成
         appointmentService.updateById(appointment);
+        // 预约完成时更新客户最后到店时间
+        Customer customer = customerService.getById(appointment.getCustomerId());
+        if (customer != null) {
+            customer.setLastVisitAt(LocalDateTime.now());
+            customerService.updateById(customer);
+        }
         return Result.success();
     }
 

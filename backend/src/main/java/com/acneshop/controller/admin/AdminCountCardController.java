@@ -2,13 +2,17 @@ package com.acneshop.controller.admin;
 
 import com.acneshop.common.Result;
 import com.acneshop.entity.CountCard;
+import com.acneshop.entity.Customer;
 import com.acneshop.security.SecurityUtils;
 import com.acneshop.service.CountCardService;
+import com.acneshop.service.CustomerService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/admin/count-card")
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminCountCardController {
 
     private final CountCardService countCardService;
+    private final CustomerService customerService;
 
     @GetMapping("/page")
     public Result<Page<CountCard>> page(@RequestParam(defaultValue = "1") Integer current,
@@ -72,6 +77,12 @@ public class AdminCountCardController {
             card.setStatus(2); // 已用完
         }
         countCardService.updateById(card);
+        // 更新客户最后到店时间
+        Customer customer = customerService.getById(card.getCustomerId());
+        if (customer != null) {
+            customer.setLastVisitAt(LocalDateTime.now());
+            customerService.updateById(customer);
+        }
         return Result.success();
     }
 

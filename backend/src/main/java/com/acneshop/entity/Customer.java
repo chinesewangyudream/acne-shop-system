@@ -22,5 +22,4 @@ public class Customer extends BaseEntity {
     private Integer isBlacklisted; // 0-否 1-是
     private String blacklistReason;
     private LocalDateTime lastVisitAt;
-    private Integer status;
 }
