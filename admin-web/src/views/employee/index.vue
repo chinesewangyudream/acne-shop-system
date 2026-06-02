@@ -24,7 +24,7 @@
       </el-form>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="phone" label="手机号(账号)" width="130" />
@@ -91,6 +91,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, name: '', role: '' })
 const tableData = ref([])
 const total = ref(0)
@@ -100,7 +101,7 @@ const formRef = ref()
 const form = reactive({ phone: '', passwordHash: '', name: '', role: 4, storeId: '', skills: '' })
 const rules = { phone: [{ required: true, message: '必填', trigger: 'blur' }], passwordHash: [{ required: true, message: '必填', trigger: 'blur' }], name: [{ required: true, message: '必填', trigger: 'blur' }], role: [{ required: true, message: '必填', trigger: 'change' }] }
 
-async function loadData() { const res = await employeePage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await employeePage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) { editId.value = row?.id || null; if (row) Object.assign(form, row); else Object.assign(form, { phone: '', passwordHash: '', name: '', role: 4, storeId: isBoss.value ? '' : userStore.userInfo.storeId, skills: '' }); dialogVisible.value = true }
 async function handleSubmit() { await formRef.value.validate(); if (editId.value) { await employeeUpdate({ ...form, id: editId.value }) } else { await employeeAdd(form) }; ElMessage.success('操作成功'); dialogVisible.value = false; loadData() }
 async function handleDelete(id) { await employeeDelete(id); ElMessage.success('删除成功'); loadData() }

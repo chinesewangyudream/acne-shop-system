@@ -3,6 +3,7 @@ package com.acneshop.controller.h5;
 import com.acneshop.common.Result;
 import com.acneshop.entity.CountCard;
 import com.acneshop.entity.PeriodCard;
+import com.acneshop.security.SecurityUtils;
 import com.acneshop.service.CountCardService;
 import com.acneshop.service.PeriodCardService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -22,8 +23,8 @@ public class H5CardController {
     private final PeriodCardService periodCardService;
 
     @GetMapping("/list")
-    public Result<Map<String, List<?>>> list(@RequestParam Long customerId,
-                                             @RequestParam Long storeId) {
+    public Result<Map<String, List<?>>> list(@RequestParam Long storeId) {
+        Long customerId = SecurityUtils.getCurrentCustomerId();
         List<CountCard> countCards = countCardService.list(
                 new LambdaQueryWrapper<CountCard>()
                         .eq(CountCard::getCustomerId, customerId)

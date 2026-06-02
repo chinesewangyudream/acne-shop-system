@@ -1,7 +1,5 @@
 package com.acneshop.security;
 
-import com.acneshop.entity.Employee;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,14 +30,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             Long userId = jwtTokenProvider.getUserId(token);
             Integer role = jwtTokenProvider.getRole(token);
             Long storeId = jwtTokenProvider.getStoreId(token);
+            String userType = jwtTokenProvider.getUserType(token);
 
-            Employee employee = new Employee();
-            employee.setId(userId);
-            employee.setRole(role);
-            employee.setStoreId(storeId);
+            UserPrincipal principal = new UserPrincipal();
+            principal.setId(userId);
+            principal.setRole(role);
+            principal.setStoreId(storeId);
+            principal.setUserType(userType);
 
-            // role 1=BOSS, 2=MANAGER, 3=RECEPTIONIST, 4=BEAUTICIAN
+            // role 0=CUSTOMER, 1=BOSS, 2=MANAGER, 3=RECEPTIONIST, 4=BEAUTICIAN
             String roleStr = switch (role) {
+                case 0 -> "CUSTOMER";
                 case 1 -> "BOSS";
                 case 2 -> "MANAGER";
                 case 3 -> "RECEPTIONIST";
@@ -50,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     new SimpleGrantedAuthority("ROLE_" + roleStr)
             );
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(employee, null, authorities);
+                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

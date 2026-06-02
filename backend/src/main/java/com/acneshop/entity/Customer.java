@@ -14,6 +14,7 @@ public class Customer extends BaseEntity {
     private Integer gender; // 0-女 1-男
     private Integer age;
     private String phone;
+    private String passwordHash;
     private String allergyHistory;
     private String acneType;
     private Integer severity; // 1-轻度 2-中度 3-重度

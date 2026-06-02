@@ -91,3 +91,7 @@ export const operationLogPage = (params) => request.get('/admin/operation-log/pa
 // 消费记录
 export const consumptionRecordPage = (params) => request.get('/admin/consumption-record/page', { params })
 export const consumptionRecordAdd = (data) => request.post('/admin/consumption-record', data)
+
+// 核销记录
+export const writeoffRecordPage = (params) => request.get('/admin/writeoff-record/page', { params })
+export const writeoffRecordDetail = (id) => request.get(`/admin/writeoff-record/${id}`)

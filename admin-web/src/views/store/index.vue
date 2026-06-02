@@ -7,7 +7,7 @@
       </el-button>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="storeName" label="门店名称" min-width="150" />
       <el-table-column prop="address" label="地址" min-width="200" />
@@ -48,6 +48,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { storePage, storeAdd, storeUpdate, storeDelete } from '../../api'
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10 })
 const tableData = ref([])
 const total = ref(0)
@@ -57,7 +58,7 @@ const formRef = ref()
 const form = reactive({ storeName: '', address: '', phone: '', businessHours: '', status: 1 })
 const rules = { storeName: [{ required: true, message: '必填', trigger: 'blur' }] }
 
-async function loadData() { const res = await storePage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await storePage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) { editId.value = row?.id || null; if (row) Object.assign(form, row); else Object.assign(form, { storeName: '', address: '', phone: '', businessHours: '', status: 1 }); dialogVisible.value = true }
 async function handleSubmit() { await formRef.value.validate(); if (editId.value) { await storeUpdate({ ...form, id: editId.value }) } else { await storeAdd(form) }; ElMessage.success('操作成功'); dialogVisible.value = false; loadData() }
 async function handleDelete(id) { await storeDelete(id); ElMessage.success('删除成功'); loadData() }

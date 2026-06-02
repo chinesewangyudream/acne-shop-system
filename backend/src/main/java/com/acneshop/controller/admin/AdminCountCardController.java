@@ -3,9 +3,11 @@ package com.acneshop.controller.admin;
 import com.acneshop.common.Result;
 import com.acneshop.entity.CountCard;
 import com.acneshop.entity.Customer;
+import com.acneshop.entity.WriteoffRecord;
 import com.acneshop.security.SecurityUtils;
 import com.acneshop.service.CountCardService;
 import com.acneshop.service.CustomerService;
+import com.acneshop.service.WriteoffRecordService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class AdminCountCardController {
 
     private final CountCardService countCardService;
     private final CustomerService customerService;
+    private final WriteoffRecordService writeoffRecordService;
 
     @GetMapping("/page")
     public Result<Page<CountCard>> page(@RequestParam(defaultValue = "1") Integer current,
@@ -77,6 +80,15 @@ public class AdminCountCardController {
             card.setStatus(2); // 已用完
         }
         countCardService.updateById(card);
+        // 写入核销记录
+        WriteoffRecord record = new WriteoffRecord();
+        record.setCustomerId(card.getCustomerId());
+        record.setStoreId(card.getStoreId());
+        record.setCardId(card.getId());
+        record.setCardType(1); // 次卡
+        record.setOperatorId(SecurityUtils.getCurrentUser().getId());
+        record.setRemainingCount(card.getRemainingCount());
+        writeoffRecordService.save(record);
         // 更新客户最后到店时间
         Customer customer = customerService.getById(card.getCustomerId());
         if (customer != null) {

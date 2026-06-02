@@ -7,7 +7,7 @@
       </el-button>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="name" label="项目名称" min-width="150" />
       <el-table-column prop="price" label="价格" width="100" align="right">
@@ -68,6 +68,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, storeId: null })
 const tableData = ref([])
 const total = ref(0)
@@ -77,7 +78,7 @@ const formRef = ref()
 const form = reactive({ name: '', price: 0, duration: 30, description: '', status: 1, storeId: null })
 const rules = { name: [{ required: true, message: '必填', trigger: 'blur' }], storeId: [{ required: true, message: '请选择门店', trigger: 'change' }] }
 
-async function loadData() { const res = await serviceItemPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await serviceItemPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) { editId.value = row?.id || null; if (row) Object.assign(form, row); else Object.assign(form, { name: '', price: 0, duration: 30, description: '', status: 1, storeId: isBoss.value ? null : userStore.userInfo.storeId }); dialogVisible.value = true }
 async function handleSubmit() { await formRef.value.validate(); if (editId.value) { await serviceItemUpdate({ ...form, id: editId.value }) } else { await serviceItemAdd(form) }; ElMessage.success('操作成功'); dialogVisible.value = false; loadData() }
 async function handleDelete(id) { await serviceItemDelete(id); ElMessage.success('删除成功'); loadData() }

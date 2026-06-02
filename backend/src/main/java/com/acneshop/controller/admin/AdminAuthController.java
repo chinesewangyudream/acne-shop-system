@@ -5,6 +5,7 @@ import com.acneshop.dto.LoginDTO;
 import com.acneshop.entity.Employee;
 import com.acneshop.mapper.EmployeeMapper;
 import com.acneshop.security.SecurityUtils;
+import com.acneshop.security.UserPrincipal;
 import com.acneshop.service.AuthService;
 import com.acneshop.vo.LoginVO;
 import jakarta.validation.Valid;
@@ -26,8 +27,8 @@ public class AdminAuthController {
 
     @GetMapping("/info")
     public Result<LoginVO> info() {
-        Employee jwtUser = SecurityUtils.getCurrentUser();
-        Employee employee = employeeMapper.selectById(jwtUser.getId());
+        UserPrincipal user = SecurityUtils.getCurrentUser();
+        Employee employee = employeeMapper.selectById(user.getId());
         LoginVO vo = new LoginVO();
         vo.setEmployeeId(employee.getId());
         vo.setName(employee.getName());

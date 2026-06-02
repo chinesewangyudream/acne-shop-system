@@ -1,25 +1,27 @@
 <template>
-  <div class="login-page">
-    <div class="login-deco"></div>
-    <div class="login-content">
+  <div class="register-page">
+    <div class="register-deco"></div>
+    <div class="register-content">
       <div class="brand">
         <div class="brand-mark">痘</div>
         <h1 class="brand-title">祛痘护理中心</h1>
-        <p class="brand-sub">专业护肤 · 科学祛痘</p>
+        <p class="brand-sub">注册新账号</p>
       </div>
 
       <div class="form-card">
         <van-cell-group inset>
           <van-field v-model="phone" label="手机号" placeholder="请输入手机号" type="tel" maxlength="11" />
-          <van-field v-model="password" label="密码" placeholder="请输入密码" type="password" />
+          <van-field v-model="password" label="密码" placeholder="请设置密码(6-20位)" type="password" />
+          <van-field v-model="confirmPassword" label="确认密码" placeholder="请再次输入密码" type="password" />
+          <van-field v-model="name" label="姓名" placeholder="选填" />
         </van-cell-group>
 
         <div class="btn-wrap">
-          <van-button type="primary" block round size="large" @click="handleLogin" class="login-btn">登 录</van-button>
+          <van-button type="primary" block round size="large" @click="handleRegister" class="register-btn">注 册</van-button>
         </div>
 
-        <div class="register-link">
-          还没有账号？<span @click="goRegister">去注册</span>
+        <div class="login-link">
+          已有账号？<span @click="goLogin">去登录</span>
         </div>
       </div>
     </div>
@@ -30,43 +32,42 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showToast } from 'vant'
-import { h5Login } from '../api'
+import { h5Register } from '../api'
 
 const router = useRouter()
 const route = useRoute()
 const phone = ref('')
 const password = ref('')
+const confirmPassword = ref('')
+const name = ref('')
 
 const storeId = route.query.storeId || ''
 
-function goRegister() {
-  router.push({ path: '/register', query: route.query })
+function goLogin() {
+  router.push({ path: '/', query: route.query })
 }
 
-async function handleLogin() {
+async function handleRegister() {
   if (!phone.value || phone.value.length !== 11) {
     showToast('请输入正确的手机号')
     return
   }
-  if (!password.value) {
-    showToast('请输入密码')
+  if (!password.value || password.value.length < 6 || password.value.length > 20) {
+    showToast('密码长度为6-20位')
     return
   }
-  const res = await h5Login({ phone: phone.value, password: password.value, storeId })
-  localStorage.setItem('h5_token', res.data.token)
-  localStorage.setItem('h5_customer_id', res.data.customerId)
-  localStorage.setItem('h5_phone', res.data.phone)
-  localStorage.setItem('h5_name', res.data.name)
-  if (res.data.storeId) {
-    localStorage.setItem('h5_store_id', res.data.storeId)
+  if (password.value !== confirmPassword.value) {
+    showToast('两次密码输入不一致')
+    return
   }
-  showToast('登录成功')
-  router.push('/home')
+  await h5Register({ phone: phone.value, password: password.value, name: name.value, storeId })
+  showToast('注册成功')
+  router.push({ path: '/', query: route.query })
 }
 </script>
 
 <style scoped>
-.login-page {
+.register-page {
   min-height: 100vh;
   background: var(--h5-teal-dark);
   position: relative;
@@ -76,7 +77,7 @@ async function handleLogin() {
   justify-content: center;
 }
 
-.login-deco {
+.register-deco {
   position: absolute;
   width: 500px;
   height: 500px;
@@ -87,7 +88,7 @@ async function handleLogin() {
   right: -120px;
 }
 
-.login-content {
+.register-content {
   width: 100%;
   max-width: 400px;
   padding: 0 20px;
@@ -155,21 +156,21 @@ async function handleLogin() {
   padding: 20px 20px 16px;
 }
 
-.login-btn {
+.register-btn {
   height: 46px;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 4px;
 }
 
-.register-link {
+.login-link {
   text-align: center;
   font-size: 13px;
   color: #999;
   padding: 0 20px 16px;
 }
 
-.register-link span {
+.login-link span {
   color: var(--h5-teal);
   cursor: pointer;
   font-weight: 500;

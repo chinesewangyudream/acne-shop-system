@@ -26,7 +26,7 @@
       </el-form>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="customerId" label="客户" width="90" align="center" />
       <el-table-column prop="cardType" label="类型" width="80" align="center">
@@ -100,6 +100,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, cardType: '', status: '' })
 const tableData = ref([])
 const total = ref(0)
@@ -109,7 +110,7 @@ const formRef = ref()
 const form = reactive({ customerId: '', storeId: '', cardType: 1, startDate: '', endDate: '', benefits: '', purchasePrice: 0 })
 const rules = { customerId: [{ required: true, message: '请选择客户', trigger: 'change' }], storeId: [{ required: true, message: '请选择门店', trigger: 'change' }], cardType: [{ required: true, message: '必填', trigger: 'change' }] }
 
-async function loadData() { const res = await periodCardPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await periodCardPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) {
   editId.value = row?.id || null
   editCustomer.value = null

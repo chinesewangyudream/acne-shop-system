@@ -7,7 +7,7 @@
       </el-button>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="name" label="方案名称" min-width="150" />
       <el-table-column prop="totalCount" label="总次数" width="90" align="center" />
@@ -68,6 +68,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10 })
 const tableData = ref([])
 const total = ref(0)
@@ -77,7 +78,7 @@ const formRef = ref()
 const form = reactive({ name: '', storeId: '', totalCount: 6, price: 0, serviceItemIds: '', description: '', status: 1 })
 const rules = { name: [{ required: true, message: '必填', trigger: 'blur' }], totalCount: [{ required: true, message: '必填', trigger: 'blur' }], price: [{ required: true, message: '必填', trigger: 'blur' }] }
 
-async function loadData() { const res = await treatmentPlanPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await treatmentPlanPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) {
   editId.value = row?.id || null
   if (row) Object.assign(form, row); else Object.assign(form, { name: '', storeId: isBoss.value ? '' : userStore.userInfo.storeId, totalCount: 6, price: 0, serviceItemIds: '', description: '', status: 1 })

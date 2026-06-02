@@ -22,6 +22,8 @@ public enum ResultCode {
     CARD_STORE_LIMIT(2004, "卡项仅限办卡门店使用"),
     APPOINTMENT_CONFLICT(3001, "预约时段冲突"),
     STORE_NOT_FOUND(4001, "门店不存在"),
+    CUSTOMER_NOT_REGISTERED(1004, "请先注册账号"),
+    CUSTOMER_BLACKLISTED(1005, "账号已被限制"),
     SMS_CODE_ERROR(5001, "验证码错误"),
     SMS_CODE_EXPIRED(5002, "验证码已过期");
 

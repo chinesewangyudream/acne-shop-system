@@ -7,6 +7,11 @@ const routes = [
     component: () => import('../views/login.vue')
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/register.vue')
+  },
+  {
     path: '/home',
     name: 'Home',
     component: () => import('../views/home.vue')
@@ -30,7 +35,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('h5_token')
-  if (to.path !== '/' && !token) {
+  if (to.path !== '/' && to.path !== '/register' && !token) {
     next('/')
   } else {
     next()

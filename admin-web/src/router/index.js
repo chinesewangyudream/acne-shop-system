@@ -16,6 +16,7 @@ const routes = [
       { path: 'appointment', name: 'Appointment', component: () => import('../views/appointment/index.vue'), meta: { title: '预约管理', roles: [1, 2, 3] } },
       { path: 'count-card', name: 'CountCard', component: () => import('../views/countCard/index.vue'), meta: { title: '次卡管理', roles: [1, 2, 3] } },
       { path: 'period-card', name: 'PeriodCard', component: () => import('../views/periodCard/index.vue'), meta: { title: '年月卡管理', roles: [1, 2, 3] } },
+      { path: 'writeoff-record', name: 'WriteoffRecord', component: () => import('../views/writeoffRecord/index.vue'), meta: { title: '核销记录', roles: [1, 2, 3] } },
       { path: 'treatment-plan', name: 'TreatmentPlan', component: () => import('../views/treatmentPlan/index.vue'), meta: { title: '疗程方案', roles: [1, 2] } },
       { path: 'service-item', name: 'ServiceItem', component: () => import('../views/serviceItem/index.vue'), meta: { title: '服务项目', roles: [1, 2] } },
       { path: 'product', name: 'Product', component: () => import('../views/product/index.vue'), meta: { title: '产品管理', roles: [1, 2] } },

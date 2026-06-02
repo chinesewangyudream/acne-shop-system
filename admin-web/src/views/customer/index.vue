@@ -22,7 +22,7 @@
       </el-form>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="gender" label="性别" width="70" align="center">
@@ -103,6 +103,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, name: '', phone: '' })
 const tableData = ref([])
 const total = ref(0)
@@ -112,7 +113,7 @@ const formRef = ref()
 const form = reactive({ name: '', gender: 0, age: null, phone: '', allergyHistory: '', acneType: '', severity: null, sourceChannel: '', tags: '', storeId: '' })
 const rules = { name: [{ required: true, message: '请输入姓名', trigger: 'blur' }], phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }], storeId: [{ required: true, message: '请选择门店', trigger: 'change' }] }
 
-async function loadData() { const res = await customerPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await customerPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) {
   editId.value = row?.id || null
   if (row) Object.assign(form, row)

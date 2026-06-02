@@ -54,7 +54,7 @@ const services = ref([])
 const datePickerValue = ref(['2026', '01', '01'])
 const timePickerValue = ref(['09', '00'])
 
-const serviceColumns = computed(() => services.value.map(s => ({ text: `${s.name} - ¥${s.price}`, value: s.id })))
+const serviceColumns = computed(() => [services.value.map(s => ({ text: `${s.name} - ¥${s.price}`, value: s.id }))])
 
 function onDateConfirm({ selectedValues }) {
   form.appointmentDate = selectedValues.join('-')
@@ -67,8 +67,11 @@ function onTimeConfirm({ selectedValues }) {
 }
 
 function onServiceConfirm({ selectedOptions }) {
-  form.serviceItemId = selectedOptions[0].value
-  selectedServiceName.value = selectedOptions[0].text
+  const selected = selectedOptions?.[0]
+  if (selected) {
+    form.serviceItemId = selected.value
+    selectedServiceName.value = selected.text
+  }
   showServicePicker.value = false
 }
 
@@ -78,7 +81,8 @@ async function handleSubmit() {
     return
   }
   const storeId = localStorage.getItem('h5_store_id')
-  await createAppointment({ ...form, storeId, source: 1, status: 1 })
+  const customerId = localStorage.getItem('h5_customer_id')
+  await createAppointment({ ...form, storeId, customerId, source: 1, status: 1 })
   showToast('预约成功')
   router.push('/home')
 }

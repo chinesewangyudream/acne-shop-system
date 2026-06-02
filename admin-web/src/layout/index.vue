@@ -66,7 +66,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../store/user'
-import { Odometer, User, Calendar, CreditCard, Scissor, Box, Avatar, OfficeBuilding, DataAnalysis, Timer, Notebook } from '@element-plus/icons-vue'
+import { Odometer, User, Calendar, CreditCard, Scissor, Box, Avatar, OfficeBuilding, DataAnalysis, Timer, Notebook, Document } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -80,6 +80,7 @@ const allMenuItems = [
   { path: '/appointment', label: '预约管理', icon: Calendar, roles: [1, 2, 3] },
   { path: '/count-card', label: '次卡管理', icon: CreditCard, roles: [1, 2, 3] },
   { path: '/period-card', label: '年月卡管理', icon: Timer, roles: [1, 2, 3] },
+  { path: '/writeoff-record', label: '核销记录', icon: Document, roles: [1, 2, 3] },
   { path: '/treatment-plan', label: '疗程方案', icon: Notebook, roles: [1, 2] },
   { path: '/service-item', label: '服务项目', icon: Scissor, roles: [1, 2] },
   { path: '/product', label: '产品管理', icon: Box, roles: [1, 2] },

@@ -1,14 +1,13 @@
 package com.acneshop.security;
 
-import com.acneshop.entity.Employee;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityUtils {
 
-    public static Employee getCurrentUser() {
+    public static UserPrincipal getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (Employee) auth.getPrincipal();
+        return (UserPrincipal) auth.getPrincipal();
     }
 
     public static Long getCurrentStoreId() {
@@ -25,6 +24,15 @@ public class SecurityUtils {
 
     public static boolean isManager() {
         return Integer.valueOf(2).equals(getCurrentRole());
+    }
+
+    public static boolean isCustomer() {
+        return getCurrentUser().isCustomer();
+    }
+
+    public static Long getCurrentCustomerId() {
+        UserPrincipal user = getCurrentUser();
+        return user.isCustomer() ? user.getId() : null;
     }
 
     public static Long effectiveStoreId(Long requestStoreId) {

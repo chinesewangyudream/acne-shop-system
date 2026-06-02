@@ -45,6 +45,7 @@ CREATE TABLE customer (
     gender TINYINT COMMENT '性别：0-女 1-男',
     age INT COMMENT '年龄',
     phone VARCHAR(20) NOT NULL COMMENT '手机号',
+    password_hash VARCHAR(255) NULL COMMENT '密码哈希（顾客注册后设置）',
     allergy_history TEXT COMMENT '过敏史',
     acne_type VARCHAR(100) COMMENT '痘痘类型',
     severity TINYINT COMMENT '严重程度：1-轻度 2-中度 3-重度',
@@ -271,7 +272,88 @@ CREATE TABLE operation_log (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) COMMENT '操作日志表';
 
+-- 18. 核销记录表
+DROP TABLE IF EXISTS writeoff_record;
+CREATE TABLE writeoff_record (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_id BIGINT NOT NULL COMMENT '客户ID',
+    store_id BIGINT NOT NULL COMMENT '门店ID',
+    card_id BIGINT NOT NULL COMMENT '卡项ID',
+    card_type TINYINT NOT NULL COMMENT '卡类型：1-次卡 2-年月卡',
+    service_item_id BIGINT COMMENT '服务项目ID',
+    operator_id BIGINT COMMENT '操作人ID',
+    remaining_count INT COMMENT '核销后剩余次数（次卡专用）',
+    remark VARCHAR(500) COMMENT '备注',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) COMMENT '核销记录表';
+
+-- ========== 索引 ==========
+
+-- P0 必建索引（覆盖核心分页查询的 WHERE + ORDER BY）
+
+-- customer: 管理端分页 WHERE store_id ORDER BY created_at
+CREATE INDEX idx_customer_store_create ON customer(store_id, created_at);
+
+-- customer: 手机号唯一约束（注册时防重复）
+CREATE UNIQUE INDEX uk_customer_phone ON customer(phone);
+
+-- appointment: 管理端分页 + H5顾客查预约
+CREATE INDEX idx_appointment_store_create ON appointment(store_id, created_at);
+CREATE INDEX idx_appointment_customer_store ON appointment(customer_id, store_id);
+
+-- count_card: 管理端分页 + H5查卡列表
+CREATE INDEX idx_count_card_store_create ON count_card(store_id, created_at);
+CREATE INDEX idx_count_card_customer_store_status ON count_card(customer_id, store_id, status);
+
+-- period_card: 管理端分页 + H5查卡列表
+CREATE INDEX idx_period_card_store_create ON period_card(store_id, created_at);
+CREATE INDEX idx_period_card_customer_store_status ON period_card(customer_id, store_id, status);
+
+-- consumption_record: 管理端分页
+CREATE INDEX idx_consumption_store_created ON consumption_record(store_id, created_at);
+
+-- writeoff_record: 管理端分页
+CREATE INDEX idx_writeoff_store_created ON writeoff_record(store_id, created_at);
+
+-- service_item: 管理端分页 + 列表接口
+CREATE INDEX idx_service_item_store_status ON service_item(store_id, status);
+
+-- treatment_plan: 管理端分页
+CREATE INDEX idx_treatment_plan_store_create ON treatment_plan(store_id, created_at);
+
+-- product: 管理端分页
+CREATE INDEX idx_product_store_create ON product(store_id, created_at);
+
+-- employee: 管理端分页
+CREATE INDEX idx_employee_store_create ON employee(store_id, created_at);
+
+-- skin_record: 按客户查皮肤档案（customer_id 必传）
+CREATE INDEX idx_skin_record_customer_date ON skin_record(customer_id, record_date);
+
+-- P1 建议索引（提升特定筛选场景）
+
+-- appointment 筛选增强
+CREATE INDEX idx_appointment_store_status ON appointment(store_id, status, created_at);
+CREATE INDEX idx_appointment_store_date ON appointment(store_id, appointment_date);
+
+-- 按客户查询（管理端可选筛选）
+CREATE INDEX idx_consumption_customer ON consumption_record(customer_id);
+CREATE INDEX idx_writeoff_customer ON writeoff_record(customer_id);
+CREATE INDEX idx_count_card_customer ON count_card(customer_id);
+CREATE INDEX idx_period_card_customer ON period_card(customer_id);
+
+-- attendance: 考勤分页查询
+CREATE INDEX idx_attendance_employee_date ON attendance(employee_id, work_date);
+
+-- stock_log: 按产品查库存变动
+CREATE INDEX idx_stock_log_product_created ON stock_log(product_id, created_at);
+
+-- operation_log: 按时间排序
+CREATE INDEX idx_operation_log_created ON operation_log(created_at);
+
 -- ========== 种子数据 ==========
+-- 默认管理员账号：13650901858 / admin123
 
 -- 门店
 INSERT INTO store (store_name, address, phone, business_hours, status) VALUES

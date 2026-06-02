@@ -19,7 +19,7 @@
       </el-form>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="name" label="产品名称" min-width="150" />
       <el-table-column prop="specification" label="规格" width="120" />
@@ -92,6 +92,7 @@ async function loadStores() {
   storeListData.value = res.data.records
 }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, name: '' })
 const tableData = ref([])
 const total = ref(0)
@@ -106,7 +107,7 @@ const stockType = ref('in')
 const stockProduct = ref(null)
 const stockForm = reactive({ quantity: 1, reason: '' })
 
-async function loadData() { const res = await productPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await productPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog(row) { editId.value = row?.id || null; if (row) Object.assign(form, row); else Object.assign(form, { name: '', specification: '', purchasePrice: 0, sellingPrice: 0, stock: 0, warningStock: 10, storeId: isBoss.value ? null : userStore.userInfo.storeId }); dialogVisible.value = true }
 function showStockDialog(row, type) { stockProduct.value = row; stockType.value = type; Object.assign(stockForm, { quantity: 1, reason: '' }); stockDialogVisible.value = true }
 async function handleSubmit() { await formRef.value.validate(); if (editId.value) { await productUpdate({ ...form, id: editId.value }) } else { await productAdd(form) }; ElMessage.success('操作成功'); dialogVisible.value = false; loadData() }

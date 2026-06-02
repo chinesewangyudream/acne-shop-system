@@ -3,6 +3,7 @@ package com.acneshop.controller.h5;
 import com.acneshop.common.Result;
 import com.acneshop.entity.Appointment;
 import com.acneshop.entity.ServiceItem;
+import com.acneshop.security.SecurityUtils;
 import com.acneshop.service.AppointmentService;
 import com.acneshop.service.ServiceItemService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -30,6 +31,7 @@ public class H5AppointmentController {
 
     @PostMapping
     public Result<Void> create(@RequestBody Appointment appointment) {
+        appointment.setCustomerId(SecurityUtils.getCurrentCustomerId());
         appointment.setSource(1); // 顾客自助
         appointment.setStatus(1); // 待确认
         appointmentService.save(appointment);
@@ -37,8 +39,8 @@ public class H5AppointmentController {
     }
 
     @GetMapping("/my")
-    public Result<List<Appointment>> myAppointments(@RequestParam Long customerId,
-                                                     @RequestParam Long storeId) {
+    public Result<List<Appointment>> myAppointments(@RequestParam Long storeId) {
+        Long customerId = SecurityUtils.getCurrentCustomerId();
         List<Appointment> list = appointmentService.list(
                 new LambdaQueryWrapper<Appointment>()
                         .eq(Appointment::getCustomerId, customerId)

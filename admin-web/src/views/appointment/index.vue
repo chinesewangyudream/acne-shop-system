@@ -24,7 +24,7 @@
       </el-form>
     </div>
 
-    <el-table :data="tableData" stripe>
+    <el-table :data="tableData" stripe v-loading="loading">
       <el-table-column prop="id" label="ID" width="70" align="center" />
       <el-table-column prop="appointmentDate" label="日期" width="120" />
       <el-table-column prop="startTime" label="开始" width="80" />
@@ -118,6 +118,7 @@ async function loadEmployees() {
 const statusLabel = { 1: '待确认', 2: '已确认', 3: '已完成', 4: '已取消', 5: '已改期' }
 const statusMap = { 1: 'warning', 2: '', 3: 'success', 4: 'danger', 5: 'info' }
 
+const loading = ref(false)
 const query = reactive({ current: 1, size: 10, status: '', date: '' })
 const tableData = ref([])
 const total = ref(0)
@@ -126,7 +127,7 @@ const formRef = ref()
 const form = reactive({ customerId: '', storeId: '', serviceItemId: '', employeeId: '', appointmentDate: '', startTime: '', endTime: '', remark: '' })
 const rules = { customerId: [{ required: true, message: '请选择客户', trigger: 'change' }], storeId: [{ required: true, message: '请选择门店', trigger: 'change' }], serviceItemId: [{ required: true, message: '请选择服务项目', trigger: 'change' }] }
 
-async function loadData() { const res = await appointmentPage(query); tableData.value = res.data.records; total.value = res.data.total }
+async function loadData() { loading.value = true; try { const res = await appointmentPage(query); tableData.value = res.data.records; total.value = res.data.total } finally { loading.value = false } }
 function showDialog() {
   Object.assign(form, { customerId: '', storeId: isBoss.value ? '' : userStore.userInfo.storeId, serviceItemId: '', employeeId: '', appointmentDate: '', startTime: '', endTime: '', remark: '' })
   dialogVisible.value = true

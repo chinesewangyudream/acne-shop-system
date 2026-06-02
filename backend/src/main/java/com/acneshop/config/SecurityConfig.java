@@ -33,10 +33,15 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
             .authorizeHttpRequests(auth -> auth
-                // H5顾客端接口 - 公开
+                // H5顾客端认证接口 - 公开（含门店列表）
                 .requestMatchers("/h5/auth/**").permitAll()
-                .requestMatchers("/h5/appointment/**").permitAll()
-                .requestMatchers("/h5/card/**").permitAll()
+                // H5绑定门店 - 需认证
+                .requestMatchers("/h5/store/**").authenticated()
+                // H5服务项目列表 - 公开（顾客扫码查看）
+                .requestMatchers(HttpMethod.GET, "/h5/appointment/services").permitAll()
+                // H5其他接口 - 需认证
+                .requestMatchers("/h5/card/**").authenticated()
+                .requestMatchers("/h5/appointment/**").authenticated()
                 // 管理后台登录 - 公开
                 .requestMatchers("/admin/auth/login").permitAll()
                 // 文件上传目录 - 公开
